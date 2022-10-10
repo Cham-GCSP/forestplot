@@ -1,0 +1,74 @@
+---
+title: "R_forest_plot"
+author: "Cham Nguyen"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, r, out.width='100%', fig.height = 10, fig.width = 10}
+data <- read.csv('C:/Users/Cham Nguyen/Desktop/meta.csv')
+
+library(pacman)
+
+pacman::p_load(dplyr, ggplot2, ggpmisc, patchwork) 
+
+
+as.data.frame(data)
+
+data1 <- data %>% 
+  filter(Group == 'Mortality')
+data2 <- data %>% 
+  filter(Group == 'Incidence')
+
+
+data_table1 <- data %>% 
+  filter(Group == "Mortality") %>% 
+  select(Study, Location, Follow.up.years, HR, LL, UL)
+
+
+data_table2 <- data %>% 
+  filter(Group == "Incidence") %>% 
+  select(Study, Location, Follow.up.years, HR, LL, UL)
+
+p1 <- ggplot() +                             # Create empty plot with table
+  theme_void() +
+  annotate(geom = "table",
+           x = 1,
+           y = 1,
+           label = list(data_table1),
+           size = 2.5)+
+  geom_text(size = 15)
+
+p2 <- ggplot(data = data1, aes(y= reorder(Study, - Year), x= HR, xmin=LL, xmax=UL)) +
+  geom_point() + 
+  geom_errorbarh(height=.1) +
+  labs(x='HR (95%CI)', y = "") +
+  geom_vline(xintercept=1, color='black', linetype='dashed', alpha=.5) +
+  ggtitle("Mortality")+
+  theme_classic()
+
+
+p3 <- ggplot() +                             # Create empty plot with table
+  theme_void() +
+  annotate(geom = "table",
+           x = 1,
+           y = 1,
+           label = list(data_table2),
+           size = 2.5)+
+    geom_text(size = 15)
+
+
+p4 <- ggplot(data = data2, aes(y= reorder(Study, - Year), x= HR, xmin=LL, xmax=UL)) +
+  geom_point() + 
+  geom_errorbarh(height=.1) +
+  labs(x='HR (95%CI)', y = "") +
+  geom_vline(xintercept=1, color='black', linetype='dashed', alpha=.5) +
+  ggtitle("Incidence")+
+  theme_classic()
+
+p1+p2+p3+p4
+```
